@@ -1,9 +1,19 @@
-import { historicalData, sensorData } from "@/lib/placeholder-data";
+import { sensorData } from "@/lib/placeholder-data";
 import { Warning } from "@/components/warning";
 import { SensorCard } from "@/components/sensor-card";
 import { SensorHistoryTable } from "@/components/sensor-history-table";
+import type { RawSensorReading } from "@/lib/types";
+import { useEffect, useState } from "react";
+import api from "@/lib/api";
 
 export default function SensorDashboard() {
+  const [historicalData, setHistoricalData] = useState<RawSensorReading[]>([])
+
+  useEffect(() => {
+    api.sensors.list().then(setHistoricalData)
+
+  }, [])
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between">

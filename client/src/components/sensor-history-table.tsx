@@ -13,18 +13,10 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table"
-
-type HistoryItem = {
-  time: string
-  dhtTemp: string
-  humidity: string
-  bmpTemp: string
-  pressure: string
-  altitude: string
-}
+import type { RawSensorReading } from "@/lib/types"
 
 type SensorHistoryTableProps = {
-  data: HistoryItem[]
+  data: RawSensorReading[]
 }
 
 export function SensorHistoryTable({ data }: SensorHistoryTableProps) {
@@ -50,11 +42,11 @@ export function SensorHistoryTable({ data }: SensorHistoryTableProps) {
             {data.map((reading, i) => (
               <TableRow key={i}>
                 <TableCell className="font-medium">{reading.time}</TableCell>
-                <TableCell>{reading.dhtTemp}</TableCell>
-                <TableCell>{reading.humidity}</TableCell>
-                <TableCell>{reading.bmpTemp}</TableCell>
-                <TableCell>{reading.pressure}</TableCell>
-                <TableCell>{reading.altitude}</TableCell>
+                <TableCell>{reading.dhtTemp} °C</TableCell>
+                <TableCell>{reading.humidity} %</TableCell>
+                <TableCell>{reading.bmpTemp} °C</TableCell>
+                <TableCell>{reading.pressure} hPa</TableCell>
+                <TableCell>{reading.altitude} m</TableCell>
               </TableRow>
             ))}
           </TableBody>
