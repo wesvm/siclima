@@ -29,4 +29,11 @@ Este proyecto combina robótica, sensorización e Internet de las Cosas (IoT) pa
 - ThingSpeak (visualización de datos)
 - Twitter API (envío automático de publicaciones)
 
+## 👥 Equipo del Proyecto
+
+| Avatar | Nombre | Rol | GitHub |
+|--------|--------|-----|--------|
+| <img src="https://github.com/wesvm.png" width="80" height="80" /> | **Walter Vilca** | Aplicativo Web y Programación (React, Express, despliegue) | [@wesvm](https://github.com/wesvm) |
+| <img src="https://github.com/Esquema.png" width="80" height="80" /> | **Ever Quispe** | Sistema Meteorológico (sensores, IoT, Twitter, ThingSpeak) | [@Esquema](https://github.com/Esquema) |
+| <img src="https://github.com/Valera-2321.png" width="80" height="80" /> | **Jeremy Valera** | Carrito Autónomo (motores, diseño físico, navegación) | [@Valera-2321](https://github.com/Valera-2321) |
 
