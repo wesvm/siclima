@@ -140,7 +140,7 @@ String generarMensajeTweet(float tempDHT, float hum, float tempBMP, float pres, 
   String tweet = "Reporte de sensores 🌡️☀️:\n";
   tweet += "DHT22 - Temp: " + String(tempDHT, 1) + "°C, Hum: " + String(hum, 1) + "%\n";
   tweet += "BMP280 - Temp: " + String(tempBMP, 1) + "°C, Presión: " + String(pres, 1) + " hPa\n";
-  tweet += "#CircuitosElectricosyElectronicos #Episi";
+  tweet += "#RoboticaII #Episi";
   return tweet;
 }
 
