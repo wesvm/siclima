@@ -1,6 +1,7 @@
 # 🚗🌦 Carrito Autónomo para Monitoreo Meteorológico en Movimiento
 
-Este proyecto combina robótica, sensorización e Internet de las Cosas (IoT) para crear un carrito autónomo capaz de monitorear en tiempo real variables ambientales como temperatura, humedad y presión en diferentes espacios de una universidad. Los datos son visualizados en un sitio web interactivo desarrollado con tecnologías modernas como React y Express.
+Este proyecto integra robótica, sensorización e Internet de las Cosas (IoT) para desarrollar un carrito autónomo capaz de registrar en tiempo real variables ambientales como temperatura, humedad y presión, mientras se desplaza por distintos espacios de la universidad.
+Además, se implementa una aplicación web con React para visualizar los datos, y un servidor en Express que expone una API REST y una conexión WebSocket para la transmisión en tiempo real de los datos. 
 
 ---
 
@@ -8,8 +9,8 @@ Este proyecto combina robótica, sensorización e Internet de las Cosas (IoT) pa
 
 - Medición de variables ambientales con sensores **BMP280** y **DHT22**
 - Microcontrolador **ESP32** con conectividad WiFi
-- Transmisión de datos en tiempo real a **ThingSpeak** y **Twitter**
-- Sitio web para visualización de resultados
+- Transmisión de datos en tiempo real via **WebSocket**
+- Sitio web para visualización de datos
 - Carrito autónomo con motores DC y controladores lógicos
 
 ---
@@ -17,23 +18,22 @@ Este proyecto combina robótica, sensorización e Internet de las Cosas (IoT) pa
 ## 🖥️ Tecnologías Utilizadas
 
 ### 🔧 Backend
-- **Node.js** con **Express.js**
-- Datos simulados en formato **JSON**
+- **Node js** con **Express**
+- **API REST** y **WebSockets** para comunicación en tiempo real
 
 ### 🎨 Frontend
 - **React** con componentes personalizados
-- HTML y CSS (Tailwind o puro, según lo usado)
+- **Tailwind CSS** para una interfaz moderna y responsiva
 
 ### 🔗 Otros
 - Arduino IDE (para cargar código en ESP32)
-- ThingSpeak (visualización de datos)
 - Twitter API (envío automático de publicaciones)
 
 ## 👥 Equipo del Proyecto
 
 | Avatar | Nombre | Rol | GitHub |
 |--------|--------|-----|--------|
-| <img src="https://github.com/wesvm.png" width="80" height="80" /> | **Walter Vilca** | Aplicativo Web y Programación (React, Express, despliegue) | [@wesvm](https://github.com/wesvm) |
-| <img src="https://github.com/Esquema.png" width="80" height="80" /> | **Ever Quispe** | Sistema Meteorológico (sensores, IoT, Twitter, ThingSpeak) | [@Esquema](https://github.com/Esquema) |
+| <img src="https://github.com/wesvm.png" width="80" height="80" /> | **Walter Vilca** | Desarrollo Web (React, Express, despliegue) | [@wesvm](https://github.com/wesvm) |
+| <img src="https://github.com/Esquema.png" width="80" height="80" /> | **Ever Quispe** | Sistema Meteorológico (sensores, IoT, Twitter) | [@Esquema](https://github.com/Esquema) |
 | <img src="https://github.com/Valera-2321.png" width="80" height="80" /> | **Jeremy Valera** | Carrito Autónomo (motores, diseño físico, navegación) | [@Valera-2321](https://github.com/Valera-2321) |
 
