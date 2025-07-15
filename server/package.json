@@ -1,0 +1,31 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "exports": "./dist/index.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.mjs",
+    "dev": "tsx watch --clear-screen=false src/index.ts",
+    "build": "pkgroll",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.14.0",
+    "pkgroll": "^2.12.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "eslintConfig": {
+    "extends": "standard"
+  }
+}
