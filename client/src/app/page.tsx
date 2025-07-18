@@ -5,13 +5,22 @@ import { SensorHistoryTable } from "@/components/sensor-history-table";
 import type { RawSensorReading } from "@/lib/types";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import { useSocket } from "@/hooks/use-socket";
+import { socket } from "@/app/socket";
 
 export default function SensorDashboard() {
+  useSocket()
   const [historicalData, setHistoricalData] = useState<RawSensorReading[]>([])
 
   useEffect(() => {
     api.sensors.list().then(setHistoricalData)
+    socket.on("pong", () => {
+      console.log("Pong received from server")
+    })
 
+    return () => {
+      socket.off("pong")
+    }
   }, [])
 
   return (
