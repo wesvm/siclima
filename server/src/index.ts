@@ -1,11 +1,13 @@
 import express from 'express'
 import cors from "cors"
+import dotenv from 'dotenv'
 import router from './routes'
 import errorHandler from "./middlewares/error"
 
 import { createServer } from 'node:http'
 import { setupSocket } from './sockets'
 
+dotenv.config()
 const PORT = process.env.PORT ?? 3000
 const app = express()
 app.disable("x-powered-by")

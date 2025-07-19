@@ -6,6 +6,17 @@ const create = async (req: Request<{}, {}, SensorSchema>, res: Response, next: N
     const rawSensorData = req.body
     const sensorData = transformSensorData(rawSensorData)
 
+    const response = await fetch(process.env.GOOGLE_SHEET_URL!, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(rawSensorData),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Google Sheet error: ${response.status} - ${errorText}`)
+    }
+
     res.status(201).json({ message: 'sensor data added', data: sensorData })
   } catch (error) {
     next(error)
