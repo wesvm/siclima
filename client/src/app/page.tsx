@@ -82,7 +82,7 @@ export default function SensorDashboard() {
         />
 
       </div>
-      <SensorHistoryTable data={historicalData} />
+      <SensorHistoryTable historicalData={historicalData} />
       <Warning />
     </div>
   )
