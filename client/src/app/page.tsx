@@ -82,7 +82,7 @@ export default function SensorDashboard() {
         />
 
       </div>
-      <SensorHistoryTable historicalData={historicalData} />
+      <SensorHistoryTable historicalData={[...historicalData].reverse()} />
       <Warning />
     </div>
   )
