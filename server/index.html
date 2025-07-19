@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>siclima - socket</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+      }
+      label {
+        display: block;
+        margin-top: 1rem;
+      }
+
+      button {
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>send data</h1>
+    <form id="sensorForm">
+      <label>Time: <input name="time" type="text" /></label>
+      <label>DHT Temp: <input type="number" name="dhtTemp" /></label>
+      <label>Humidity: <input type="number" name="humidity" /></label>
+      <label>BMP Temp: <input type="number" name="bmpTemp" /></label>
+      <label>Pressure: <input type="number" name="pressure" /></label>
+      <label>Altitude: <input type="number" name="altitude" /></label>
+      <label>
+        DHT Status:
+        <input type="checkbox" name="dhtStatus" />
+      </label>
+      <label>
+        BMP Status:
+        <input type="checkbox" name="bmpStatus" />
+      </label>
+      <button type="submit">Enviar</button>
+    </form>
+
+    <script type="module">
+      import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
+
+      const socket = io();
+
+      const form = document.getElementById("sensorForm");
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        const data = {
+          time: formData.get("time"),
+          dhtTemp: Number(formData.get("dhtTemp")),
+          humidity: Number(formData.get("humidity")),
+          bmpTemp: Number(formData.get("bmpTemp")),
+          pressure: Number(formData.get("pressure")),
+          altitude: Number(formData.get("altitude")),
+          dhtStatus: formData.get("dhtStatus") === "on",
+          bmpStatus: formData.get("bmpStatus") === "on",
+        };
+
+        socket.emit("sensor:data", data);
+      });
+    </script>
+  </body>
+</html>

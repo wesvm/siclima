@@ -1,12 +1,15 @@
 import type { Socket } from "socket.io"
+import { sensorSchema, transformSensorData } from "../schemas/sensor.shema"
 
 export function socketHandlers(socket: Socket) {
-  socket.on("ping", () => {
-    console.log("Received ping")
-    socket.emit("pong")
-  })
+  socket.on("sensor:data", (payload) => {
+    const parsed = sensorSchema.safeParse(payload)
+    if (!parsed.success) return console.error("Invalid sensor data")
 
-  socket.on("disconnect", () => {
-    console.log(`Socket disconnected: ${socket.id}`)
+    const raw = parsed.data
+    const sensorData = transformSensorData(raw)
+
+    console.log("Received sensor data:", sensorData)
+    socket.broadcast.emit("sensor:data", sensorData)
   })
 }

@@ -17,6 +17,12 @@ app.use(errorHandler)
 const server = createServer(app)
 setupSocket(server)
 
+import path from "path"
+
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(process.cwd(), 'index.html'))
+})
+
 server.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`)
 })
