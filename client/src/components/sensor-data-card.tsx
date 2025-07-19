@@ -2,16 +2,18 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Thermometer, Gauge } from "lucide-react"
 
-type SensorReading = {
-  value: number
-  unit: string
-  status: string
+type SensorDataSection = {
+  [key: string]: {
+    value: number | undefined
+    unit: string
+  }
 }
 
 type SensorCardProps = {
   name: string
-  icon: "thermometer" | "gauge"
-  data: Record<string, SensorReading>
+  icon: keyof typeof iconMap
+  data: SensorDataSection
+  status?: boolean
 }
 
 const iconMap = {
@@ -19,7 +21,8 @@ const iconMap = {
   gauge: <Gauge className="h-5 w-5 text-purple-500" />,
 }
 
-export function SensorCard({ name, icon, data }: SensorCardProps) {
+export function SensorDataCard({ name, icon, data, status }: SensorCardProps) {
+
   return (
     <Card>
       <CardHeader>
@@ -32,14 +35,15 @@ export function SensorCard({ name, icon, data }: SensorCardProps) {
           {Object.entries(data).map(([label, { value, unit }]) => (
             <div key={label} className="flex justify-between items-center">
               <span className="text-sm text-gray-600 capitalize">{label}:</span>
-              <span className="font-medium">
-                {value} {unit}
-              </span>
+              <span className="font-medium">{value == undefined ? "--" : `${value} ${unit}`}</span>
             </div>
           ))}
+
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Estado:</span>
-            <Badge className="bg-green-100 text-green-800">Activo</Badge>
+            <Badge className={status ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
+              {status ? "Activo" : "Inactivo"}
+            </Badge>
           </div>
         </div>
       </CardContent>
