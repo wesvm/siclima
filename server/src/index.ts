@@ -19,9 +19,7 @@ setupSocket(server)
 
 import path from "path"
 
-app.get('/', (_req, res) => {
-  res.sendFile(path.join(process.cwd(), 'index.html'))
-})
+app.use(express.static(path.join(process.cwd(), 'public')))
 
 server.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`)
