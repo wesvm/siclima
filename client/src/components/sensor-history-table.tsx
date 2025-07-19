@@ -37,14 +37,17 @@ export function SensorHistoryTable({ historicalData }: SensorHistoryTableProps) 
       </CardHeader>
       <CardContent>
         <HistoricalTable historicalData={currentData} />
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalItems={historicalData.length}
-          startIndex={startIndex}
-          endIndex={endIndex}
-          onPageChange={setCurrentPage}
-        />
+
+        {historicalData.length > 0 && (
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={historicalData.length}
+            startIndex={startIndex}
+            endIndex={endIndex}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </CardContent>
     </Card>
   )
@@ -64,16 +67,24 @@ function HistoricalTable({ historicalData: data }: SensorHistoryTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.map((reading, i) => (
-          <TableRow key={i}>
-            <TableCell className="font-medium">{reading.time}</TableCell>
-            <TableCell>{reading.dhtTemp} °C</TableCell>
-            <TableCell>{reading.humidity} %</TableCell>
-            <TableCell>{reading.bmpTemp} °C</TableCell>
-            <TableCell>{reading.pressure} hPa</TableCell>
-            <TableCell>{reading.altitude} m</TableCell>
+        {data.length ? (
+          data.map((reading, i) => (
+            <TableRow key={i}>
+              <TableCell className="font-medium">{reading.time}</TableCell>
+              <TableCell>{reading.dhtTemp} °C</TableCell>
+              <TableCell>{reading.humidity} %</TableCell>
+              <TableCell>{reading.bmpTemp} °C</TableCell>
+              <TableCell>{reading.pressure} hPa</TableCell>
+              <TableCell>{reading.altitude} m</TableCell>
+            </TableRow>
+          ))
+        ) : (
+          <TableRow>
+            <TableCell colSpan={6} className="text-gray-500 h-24 text-center">
+              No hay datos históricos disponibles
+            </TableCell>
           </TableRow>
-        ))}
+        )}
       </TableBody>
     </Table>
   )
