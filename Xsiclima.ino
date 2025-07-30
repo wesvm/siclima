@@ -16,6 +16,8 @@
 #define ACCESS_TOKEN " - "
 #define ACCESS_TOKEN_SECRET " "
 
+String apiKey = " "; 
+
 #define MQ135PIN 35
 #define CALIBRATION_SAMPLE_TIMES 50
 #define CALIBRATION_SAMPLE_INTERVAL 500
@@ -45,11 +47,16 @@ float  current_co2_ppm  = 0;
 float  current_co_ppm   = 0;
 float  current_nh4_ppm  = 0;
 
+float alcohol_ppm = 0;
+float acetona_ppm = 0;
+
 unsigned long lastTweetTime      = 0;
 unsigned long lastSensorReadTime = 0;
+unsigned long lastThingSpeakTime = 0;
 
 constexpr unsigned long TWEET_INTERVAL_MS   = 2UL * 60UL * 1000UL;
 constexpr unsigned long SENSOR_READ_MS      = 5UL * 1000UL;
+constexpr unsigned long THINGSPEAK_INTERVAL_MS = 20000;
 
 void   conectarWiFi();
 void   sincronizarTiempo();
@@ -74,6 +81,8 @@ bool   enviarTweet(const String& mensajeTweet);
 String generarMensajeTweet(float tempDHT, float hum, float tempBMP, float pres, float alt);
 
 
+
+
 void setup() {
   Serial.begin(115200);
   randomSeed(micros());
@@ -90,7 +99,7 @@ void setup() {
 
 void loop() {
   const unsigned long now = millis();
-
+  // Verificar si toca leer sensores
   if (now - lastSensorReadTime >= SENSOR_READ_MS) {
     lastSensorReadTime = now;
 
@@ -106,7 +115,7 @@ void loop() {
     if (!isnan(temperaturaDHT) && !isnan(humedad) &&
         !isnan(temperaturaBMP) && !isnan(presion)) {
       imprimirLecturas(temperaturaDHT, humedad, temperaturaBMP, presion, altitud);
-
+      // Verifica si toca enviar tweet
       if (now - lastTweetTime >= TWEET_INTERVAL_MS) {
         String mensaje = generarMensajeTweet(temperaturaDHT, humedad, temperaturaBMP, presion, altitud);
         if (enviarTweet(mensaje)) {
@@ -115,12 +124,30 @@ void loop() {
           Serial.println(F("Fallo al enviar tweet. Reintentando más tarde..."));
         }
       }
+
+      // Verifica si toca enviar a ThingSpeak
+      if (now - lastThingSpeakTime >= THINGSPEAK_INTERVAL_MS) {
+        enviarDatosThingSpeak(
+          temperaturaDHT,
+          humedad,
+          presion,
+          current_co2_ppm,
+          current_co_ppm,
+          current_nh4_ppm,
+          alcohol_ppm,
+          obtenerEstadoMQ135()
+        );
+        lastThingSpeakTime = now;
+      }
+
     } else {
       Serial.println(F("Error en la lectura de sensores (NaN)."));
     }
   }
   delay(5);
 }
+
+
 
 void conectarWiFi() {
   Serial.println("Conectando a WiFi...");
@@ -257,12 +284,14 @@ void leerMQ135() {
   current_co2_ppm = calcularPPM(rs, "CO2");
   current_co_ppm = calcularPPM(rs, "CO");
   current_nh4_ppm = calcularPPM(rs, "NH4");
-  float acetona_ppm = calcularPPM(rs, "Acetona");
-  float alcohol_ppm = calcularPPM(rs, "Alcohol");
+  acetona_ppm = calcularPPM(rs, "Acetona");
+  alcohol_ppm = calcularPPM(rs, "Alcohol");
   
+  /*
   Serial.println("========== LECTURA MQ135 ==========");
   Serial.printf("ADC: %.0f | Voltaje: %.2fV | Rs: %.2f kΩ\n", adc_value, voltage, rs);
   Serial.printf("RZero: %.2f kΩ | Ratio Rs/RZero: %.2f\n", rzero, rs/rzero);
+  */
   Serial.println("--- CONCENTRACIONES (PPM) ---");
   Serial.printf("🏭 CO2: %.1f ppm %s\n", current_co2_ppm, (current_co2_ppm > CO2_THRESHOLD) ? "⚠️ ALTO" : "✅");
   Serial.printf("☠️ CO: %.1f ppm %s\n", current_co_ppm, (current_co_ppm > CO_THRESHOLD) ? "🚨 PELIGROSO" : "✅");
@@ -367,9 +396,61 @@ String generarMensajeTweet(float tempDHT, float hum, float tempBMP, float pres, 
   tweet += "DHT22 - Temp: " + String(tempDHT, 1) + "°C, Hum: " + String(hum, 1) + "%\n";
   tweet += "BMP280 - Temp: " + String(tempBMP, 1) + "°C, Presión: " + String(pres, 1) + " hPa\n";
   tweet += "MQ135 - " + obtenerEstadoMQ135() + "\n";
+
+  // Alertas segun umbral
+  String alertaCO2 = (current_co2_ppm > CO2_THRESHOLD) ? "⚠️" : "✅";
+  String alertaCO  = (current_co_ppm  > CO_THRESHOLD)  ? "🚨" : "✅";
+  String alertaNH4 = (current_nh4_ppm > NH4_THRESHOLD) ? "⚠️" : "✅";
+  String alertaAce = (acetona_ppm     > ACETONA_THRESHOLD) ? "⚠️" : "✅";
+  String alertaAlc = (alcohol_ppm     > ALCOHOL_THRESHOLD) ? "⚠️" : "✅";
+  // Lectura de Gases
+  tweet += "PPM: CO₂:" + String(current_co2_ppm, 1) + alertaCO2;
+  tweet += " CO:" + String(current_co_ppm, 1) + alertaCO;
+  tweet += " NH₄:" + String(current_nh4_ppm, 1) + alertaNH4;
+  tweet += " Ace:" + String(acetona_ppm, 1) + alertaAce;
+  tweet += " Alc:" + String(alcohol_ppm, 1) + alertaAlc + "\n";
+
   tweet += "#RoboticaII #Episi";
   return tweet;
 }
+
+void enviarDatosThingSpeak(float tempDHT, float hum, float pres, float current_co2_ppm, float current_co_ppm, 
+                           float current_nh4_ppm, float alcohol_ppm, String estadoMQ135) {
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("❌ WiFi no conectado. No se envían datos.");
+    return;
+  }
+
+  HTTPClient http;
+  String url = "http://api.thingspeak.com/update?api_key=" + apiKey;
+
+  url += "&field1=" + String(tempDHT, 1);                       // Temp DHT22
+  url += "&field2=" + String(hum, 1);                           // Humedad
+  url += "&field3=" + String(pres, 1);                          // Presión BMP280
+  url += "&field4=" + String(current_co2_ppm, 1);              // CO₂ ppm
+  url += "&field5=" + String(current_co_ppm, 1);               // CO ppm
+  url += "&field6=" + String(current_nh4_ppm, 1);              // NH₄ ppm
+  url += "&field7=" + String(alcohol_ppm, 1);                  // Alcohol ppm
+  url += "&field8=" + String((obtenerEstadoMQ135().indexOf("alta") >= 0) ? 1 : 0); // 1 = alerta
+
+  Serial.println("📡 Enviando a ThingSpeak...");
+  Serial.println(url);
+
+  http.begin(url);
+  int httpCode = http.GET();
+  http.end();
+
+  if (httpCode == 200) {
+    Serial.println("✅ Datos enviados correctamente a ThingSpeak.");
+  } else if (httpCode > 0) {
+    Serial.print("⚠️ Error HTTP: ");
+    Serial.println(httpCode);
+  } else {
+    Serial.print("❌ Error de conexión: ");
+    Serial.println(http.errorToString(httpCode).c_str());
+  }
+}
+
 
 String urlEncode(const String& str) {
   String encoded;
@@ -483,3 +564,5 @@ bool enviarTweet(const String& mensajeTweet) {
   http.end();
   return httpResponseCode == 201;
 }
+
+
